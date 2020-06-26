@@ -5,7 +5,11 @@ var indexComponent = 0;
 
 var gridPositions = [];
 
-var actualPiece;
+var actualTetrimino = {
+    pieces: [],
+    positions: [],
+    actualPosition: 0,
+};
 var previousPieces = [];
 
 const block = {
@@ -41,57 +45,68 @@ function loadPieces() {
     generateNewPiece();
 }
 
-function generateNewPiece() {
-    let tetrimino = tetriminos[Math.floor((Math.random() * (tetriminos.length - 1)) + 0)];
-    actualPiece = [];
+function generateNewPiece(idxTetrimino = -1) {
+    let tetrimino = (idxTetrimino != -1) ? tetriminos[idxTetrimino] : tetriminos[Math.floor((Math.random() * (tetriminos.length)) + 0)];
+    actualTetrimino.pieces = [];
+    actualTetrimino.positions = tetrimino.positions;
+    actualTetrimino.actualPosition = 0;
+
     for (let index = 0; index < tetrimino.diagram.length; index++) {
         let piece = new component(indexComponent, block.width, block.height, block.lineWidth, block.lineColor, tetrimino.backColor, setColumnPosition(tetrimino.diagram[index][1]), setRowPosition(tetrimino.diagram[index][0]));
-        actualPiece.push(piece);
+        actualTetrimino.pieces.push(piece);
         listComponents.push(piece);
         indexComponent++;
     }
 }
 
-function movePieceLeft(piece) {
-    if (!collid(piece, "left")) {
-        piece.map(p => {
-            p.x -= block.width;
+function movePieceLeft(pieces) {
+    if (!collid(pieces, "left")) {
+        pieces.map(piece => {
+            piece.x -= block.width;
         })
     }
 }
 
-function movePieceRight(piece) {
-    if (!collid(piece, "right")) {
-        piece.map(p => {
-            p.x += block.width;
+function movePieceRight(pieces) {
+    if (!collid(pieces, "right")) {
+        pieces.map(piece => {
+            piece.x += block.width;
         });
     }
 }
 
-function movePieceDown(piece) {
-    if (!collid(piece, "down")) {
-        piece.map(p => {
-            p.y += block.height;
+function movePieceDown(pieces) {
+    if (!collid(pieces, "down")) {
+        pieces.map(piece => {
+            piece.y += block.height;
         });
     }
     else {
-        savePiece(piece); 
+        savePiece(pieces); 
     }
 }
 
-// temp
-function movePieceUp(piece) {
-    piece.map(p => {
-        p.y -= block.height;
-    });
+function rotatePiece(pieces) {
+    const actualPositionTetrimino = actualTetrimino.actualPosition;
+    const positionsActualTetrimino = actualTetrimino.positions[actualPositionTetrimino];
+
+    for (let index = 0; index < pieces.length; index++) {
+        const columnPosition = getColumnPosition(pieces[index].x) + positionsActualTetrimino[index][1];
+        const rowPosition = getRowPosition(pieces[index].y) + positionsActualTetrimino[index][0];
+
+        pieces[index].x = setColumnPosition(columnPosition);
+        pieces[index].y = setRowPosition(rowPosition);
+    }
+
+    actualTetrimino.actualPosition = (actualPositionTetrimino < (actualTetrimino.positions.length -1)) ? (actualTetrimino.actualPosition + 1) : 0;
 }
 
-function collid(piece, direction) {
+function collid(pieces, direction) {
     let colid = false;
     
-    let leftMostPiece = getLeftMostPiece(piece);
-    let rightMostPiece = getRightMostPiece(piece);
-    let lowestPiece = getLowestPiece(piece);
+    let leftMostPiece = getLeftMostPiece(pieces);
+    let rightMostPiece = getRightMostPiece(pieces);
+    let lowestPiece = getLowestPiece(pieces);
     
     let rowPosition = getRowPosition(lowestPiece.y);
     let columnLeftPosition = getColumnPosition(leftMostPiece.x);
@@ -132,41 +147,41 @@ function collid(piece, direction) {
     }
 
     if (!colid) {
-        for (let idxRow = 0; idxRow < piece.length; idxRow++) {
-            positions.push(gridPositions[getRowPosition(piece[idxRow].y) + appendRow][getColumnPosition(piece[idxRow].x) + appendColumn] == 0);
+        for (let idxRow = 0; idxRow < pieces.length; idxRow++) {
+            positions.push(gridPositions[getRowPosition(pieces[idxRow].y) + appendRow][getColumnPosition(pieces[idxRow].x) + appendColumn] == 0);
         }
-        colid = positions.some(p => p === false) ? true : false;
+        colid = positions.some(piece => piece === false) ? true : false;
     }
 
     return colid;
 }
 
-function putPieceDown(piece) {
+function putPieceDown(pieces) {
     let leaveWhile = false;
 
     do {
-        if (collid(piece, "down")) {
+        if (collid(pieces, "down")) {
             leaveWhile = true;
         }
         else {
-            movePieceDown(piece);
+            movePieceDown(pieces);
         }
     } while(!leaveWhile);
     
     // temp
-    console.clear();
+    // console.clear();
     for (let idxRow = 0; idxRow < gridPositions.length; idxRow++) {
         let stringCol = idxRow + ": ";
         for (let idxCol = 0; idxCol < gridPositions[idxRow].length; idxCol++) {
             stringCol += "[" + gridPositions[idxRow][idxCol] + "] ";
         }
-        console.log(stringCol);
+        //  (stringCol);
     }
 }
 
-function savePiece(piece) {
-    piece.map(p => {
-        gridPositions[getRowPosition(p.y)][getColumnPosition(p.x)] = 1;
+function savePiece(pieces) {
+    pieces.map(piece => {
+        gridPositions[getRowPosition(piece.y)][getColumnPosition(piece.x)] = 1;
     });
     generateNewPiece();
 }
@@ -188,47 +203,47 @@ function getRowPosition(y) {
     return y / block.height;
 }
 
-function getLeftMostPiece(piece) {
+function getLeftMostPiece(pieces) {
     let leftMostPiece;
 
-    piece.map(p => {
-        let columnPiece = getColumnPosition(p.x);
+    pieces.map(piece => {
+        let columnPiece = getColumnPosition(piece.x);
         if (leftMostPiece == undefined) {
-            leftMostPiece = p;
+            leftMostPiece = piece;
         }
         else if (columnPiece < getColumnPosition(leftMostPiece.x)) {
-            leftMostPiece = p;
+            leftMostPiece = piece;
         }    
     });
     return leftMostPiece;
 }
 
-function getRightMostPiece(piece) {
+function getRightMostPiece(pieces) {
     let rightMostPiece;
 
-    piece.map(p => {
-        let columnPiece = getColumnPosition(p.x);
+    pieces.map(piece => {
+        let columnPiece = getColumnPosition(piece.x);
         if (rightMostPiece == undefined) {
-            rightMostPiece = p;
+            rightMostPiece = piece;
         }
         else if (columnPiece > getColumnPosition(rightMostPiece.x)) {
-            rightMostPiece = p;
+            rightMostPiece = piece;
         }
     });
     
     return rightMostPiece;
 }
 
-function getLowestPiece(piece) {
+function getLowestPiece(pieces) {
     let lowestPiece;
 
-    piece.map(p => {
-        let rowPiece = getRowPosition(p.y);
+    pieces.map(piece => {
+        let rowPiece = getRowPosition(piece.y);
         if (lowestPiece == undefined) {
-            lowestPiece = p;
+            lowestPiece = piece;
         }
         else if (rowPiece > getRowPosition(lowestPiece.y)) {
-            lowestPiece = p;
+            lowestPiece = piece;
         }
     });
     return lowestPiece;

@@ -1,6 +1,6 @@
 var listComponents = [];
 
-function component(index, width, height, lineWidth, lineColor, color, x, y) {
+function component(index, width, height, lineWidth, lineColor, color, x, y, text = "") {
     this.index = index;
     this.width = width;
     this.height = height;
@@ -9,6 +9,7 @@ function component(index, width, height, lineWidth, lineColor, color, x, y) {
     this.y = y;
     this.speedX = 0;
     this.speedY = 0;
+    this.text = text;
 
     this.updCtx = function() {
         ctx = area.context;
@@ -19,6 +20,15 @@ function component(index, width, height, lineWidth, lineColor, color, x, y) {
         ctx.lineWidth = lineWidth;
         ctx.strokeStyle = lineColor;
         ctx.stroke();
+        
+        if (this.text !== "") {
+            ctx.font ="30px Arial";
+            ctx.textAlign = "center";
+            ctx.textBaseLine = "middle";
+            ctx.fillStyle = "#000000";
+            ctx.fillText(this.text, this.x + (this.width / 2), this.y + this.height);
+        }
+
     };
 
     this.updPos = function() {

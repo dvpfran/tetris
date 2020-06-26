@@ -15,21 +15,21 @@ var area = {
 
         window.addEventListener("keydown", function(e) {
             if (e.keyCode === 68 || e.keyCode === 39) {
-                movePieceRight(actualPiece);
+                movePieceRight(actualTetrimino.pieces);
             }
             else if (e.keyCode === 65 || e.keyCode === 37) {
-                movePieceLeft(actualPiece);
+                movePieceLeft(actualTetrimino.pieces);
             }
             else if (e.keyCode === 87 || e.keyCode === 38) {
-                movePieceUp(actualPiece);
+                rotatePiece(actualTetrimino.pieces);
             }
             else if (e.keyCode === 83 || e.keyCode === 40) {
-                movePieceDown(actualPiece);
+                movePieceDown(actualTetrimino.pieces);
             }
             else if (e.keyCode === 32) {
                 if (autorizeFunction) {
                     autorizeFunction = false;
-                    putPieceDown(actualPiece);
+                    putPieceDown(actualTetrimino.pieces);
                 }
             }
         });
