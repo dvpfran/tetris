@@ -235,7 +235,7 @@ function getLowestPiece(piece) {
 }
 
 function setColumnPosition(pos) {
-    return (pos - 1) * block.width;
+    return pos * block.width;
 }
 
 function setRowPosition(pos) {
