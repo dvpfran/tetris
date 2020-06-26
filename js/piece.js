@@ -74,6 +74,9 @@ function movePieceDown(piece) {
             p.y += block.height;
         });
     }
+    else {
+        savePiece(piece); 
+    }
 }
 
 // temp
@@ -84,7 +87,7 @@ function movePieceUp(piece) {
 }
 
 function collid(piece, direction) {
-    let colid = true;
+    let colid = false;
     
     let leftMostPiece = getLeftMostPiece(piece);
     let rightMostPiece = getRightMostPiece(piece);
@@ -94,17 +97,17 @@ function collid(piece, direction) {
     let columnLeftPosition = getColumnPosition(leftMostPiece.x);
     let columnRightPosition = getColumnPosition(rightMostPiece.x);
 
+    let positions = [];
+    let appendColumn = 0;
+    let appendRow = 0;
+
     switch(direction) {
         case "left":
             if (columnLeftPosition == 0) {
                 colid = true
             }
             else {
-                let positions = [];
-                for (let idxRow = 0; idxRow < piece.length; idxRow++) {
-                    positions.push(gridPositions[getRowPosition(piece[idxRow].y) + 0][getColumnPosition(piece[idxRow].x) - 1] == 0);
-                }
-                colid = positions.some(p => p == false) ? true : false;
+                appendColumn = -1;
             }
             break;
 
@@ -113,11 +116,7 @@ function collid(piece, direction) {
                 colid = true;
             }
             else {
-                let positions = [];
-                for (let idxRow = 0; idxRow < piece.length; idxRow++) {
-                    positions.push(gridPositions[getRowPosition(piece[idxRow].y) + 0][getColumnPosition(piece[idxRow].x) + 1] == 0);
-                }
-                colid = positions.some(p => p == false) ? true : false;
+                appendColumn = 1;
             }
             break;
 
@@ -127,18 +126,18 @@ function collid(piece, direction) {
                 colid = true;
             }
             else {
-                let positions = [];
-                for (let idxRow = 0; idxRow < piece.length; idxRow++) {
-                    positions.push(gridPositions[getRowPosition(piece[idxRow].y) + 1][getColumnPosition(piece[idxRow].x)] == 0);
-                }
-                colid = positions.some(p => p === false) ? true : false;
-            }
-
-            if (colid) { 
-                savePiece(piece); 
+                appendRow = 1;
             }
             break;
     }
+
+    if (!colid) {
+        for (let idxRow = 0; idxRow < piece.length; idxRow++) {
+            positions.push(gridPositions[getRowPosition(piece[idxRow].y) + appendRow][getColumnPosition(piece[idxRow].x) + appendColumn] == 0);
+        }
+        colid = positions.some(p => p === false) ? true : false;
+    }
+
     return colid;
 }
 
