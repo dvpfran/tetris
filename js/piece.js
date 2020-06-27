@@ -1,6 +1,14 @@
 const pixelBlock = 1;
 const gridColumns = 10;
 const gridRows = 10;
+
+const pieceDirection = {
+    RIGHT: 0,
+    BOTTOM: 1,
+    LEFT: 2,
+    TOP: 3
+}
+
 var indexComponent = 0;
 
 var gridPositions = [];
@@ -60,7 +68,7 @@ function generateNewPiece(idxTetrimino = -1) {
 }
 
 function movePieceLeft(pieces) {
-    if (!collid(pieces, "left")) {
+    if (!collid(pieces, pieceDirection.LEFT)) {
         pieces.map(piece => {
             piece.x -= block.width;
         })
@@ -68,7 +76,7 @@ function movePieceLeft(pieces) {
 }
 
 function movePieceRight(pieces) {
-    if (!collid(pieces, "right")) {
+    if (!collid(pieces, pieceDirection.RIGHT)) {
         pieces.map(piece => {
             piece.x += block.width;
         });
@@ -76,7 +84,7 @@ function movePieceRight(pieces) {
 }
 
 function movePieceDown(pieces) {
-    if (!collid(pieces, "down")) {
+    if (!collid(pieces, pieceDirection.BOTTOM)) {
         pieces.map(piece => {
             piece.y += block.height;
         });
@@ -91,11 +99,11 @@ function rotatePiece(pieces) {
     const positionsActualTetrimino = actualTetrimino.positions[actualPositionTetrimino];
 
     for (let index = 0; index < pieces.length; index++) {
-        const columnPosition = getColumnPosition(pieces[index].x) + positionsActualTetrimino[index][1];
-        const rowPosition = getRowPosition(pieces[index].y) + positionsActualTetrimino[index][0];
+        const newColumnPosition = getColumnPosition(pieces[index].x) + positionsActualTetrimino[index][1];
+        const newRowPosition = getRowPosition(pieces[index].y) + positionsActualTetrimino[index][0];
 
-        pieces[index].x = setColumnPosition(columnPosition);
-        pieces[index].y = setRowPosition(rowPosition);
+        pieces[index].x = setColumnPosition(newColumnPosition);
+        pieces[index].y = setRowPosition(newRowPosition);
     }
 
     actualTetrimino.actualPosition = (actualPositionTetrimino < (actualTetrimino.positions.length -1)) ? (actualTetrimino.actualPosition + 1) : 0;
@@ -112,13 +120,12 @@ function collid(pieces, direction) {
     let columnLeftPosition = getColumnPosition(leftMostPiece.x);
     let columnRightPosition = getColumnPosition(rightMostPiece.x);
 
-    let positions = [];
     let appendColumn = 0;
     let appendRow = 0;
 
     switch(direction) {
-        case "left":
-            if (columnLeftPosition == 0) {
+        case pieceDirection.LEFT:
+            if (columnLeftPosition === 0) {
                 colid = true
             }
             else {
@@ -126,7 +133,7 @@ function collid(pieces, direction) {
             }
             break;
 
-        case "right":
+        case pieceDirection.RIGHT:
             if (columnRightPosition == (gridColumns - 1)) {
                 colid = true;
             }
@@ -135,8 +142,7 @@ function collid(pieces, direction) {
             }
             break;
 
-        case "down":
-            // let's check if we can go down!!
+        case pieceDirection.BOTTOM:
             if (rowPosition == (gridRows - 1)) {
                 colid = true;
             }
@@ -144,15 +150,25 @@ function collid(pieces, direction) {
                 appendRow = 1;
             }
             break;
+
+        case pieceDirection.TOP:
+            if (rowPosition === 0) {
+                colid = true;
+            }
+            else {
+                appendRow = -1;
+            }
+            break;
     }
 
     if (!colid) {
         for (let idxRow = 0; idxRow < pieces.length; idxRow++) {
-            positions.push(gridPositions[getRowPosition(pieces[idxRow].y) + appendRow][getColumnPosition(pieces[idxRow].x) + appendColumn] == 0);
+            if (gridPositions[getRowPosition(pieces[idxRow].y) + appendRow][getColumnPosition(pieces[idxRow].x) + appendColumn] == 1) {
+               idxRow = pieces.length;
+               colid = true; 
+            }
         }
-        colid = positions.some(piece => piece === false) ? true : false;
     }
-
     return colid;
 }
 
@@ -160,11 +176,11 @@ function putPieceDown(pieces) {
     let leaveWhile = false;
 
     do {
-        if (collid(pieces, "down")) {
+        if (collid(pieces, pieceDirection.BOTTOM)) {
             leaveWhile = true;
         }
         else {
-            movePieceDown(pieces);
+            movePieceDown(pieces, pieceDirection.BOTTOM);
         }
     } while(!leaveWhile);
     
