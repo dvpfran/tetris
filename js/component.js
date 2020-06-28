@@ -1,4 +1,5 @@
 var listComponents = [];
+var indexComponent = 0;
 
 function component(index, width, height, lineWidth, lineColor, color, x, y, text = "") {
     this.index = index;

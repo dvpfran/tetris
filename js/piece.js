@@ -1,4 +1,3 @@
-const pixelBlock = 1;
 const gridColumns = 10;
 const gridRows = 15;
 
@@ -11,8 +10,6 @@ const pieceDirection = {
 
 var actualTimeout = 300;
 var additionalTimeout = 0;
-var indexComponent = 0;
-
 var gridPositions = [];
 
 var actualTetrimino = {
@@ -22,14 +19,13 @@ var actualTetrimino = {
 };
 
 const block = {
-    width: pixelBlock * 43,
-    height: pixelBlock * 43,
+    pixelBlock: 1,
+    width: 43 * this.pixelBlock,
+    height: 43 * this.pixelBlock,
     lineWidth: 2,
     lineColor: "white",
     backColor: "rgb(100, 99, 99)",
 }
-
-const tetriminos = [I, J, L, O, S, T, Z];
 
 function generateGridPositions() {
     let columnPositon = [];
