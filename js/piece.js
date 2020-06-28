@@ -8,6 +8,16 @@ const pieceDirection = {
     TOP: 3
 }
 
+const pixelBlock = 1;
+
+const block = {
+    width: 43 * pixelBlock,
+    height: 43 * pixelBlock,
+    lineWidth: 2,
+    lineColor: "white",
+    backColor: "rgb(100, 99, 99)",
+}
+
 var actualTimeout = 300;
 var additionalTimeout = 0;
 var gridPositions = [];
@@ -17,15 +27,6 @@ var actualTetrimino = {
     positions: [],
     actualPosition: 0,
 };
-
-const block = {
-    pixelBlock: 1,
-    width: 43 * this.pixelBlock,
-    height: 43 * this.pixelBlock,
-    lineWidth: 2,
-    lineColor: "white",
-    backColor: "rgb(100, 99, 99)",
-}
 
 function generateGridPositions() {
     let columnPositon = [];
@@ -41,9 +42,10 @@ function generateGridPositions() {
 }
 
 function loadPieces() {
+    // grid
     for(let indexRow = 0; indexRow < gridRows; indexRow++) {
         for (let indexColumn = 0; indexColumn < gridColumns; indexColumn++) {
-            listComponents.push(new component(indexComponent, block.width, block.height, block.lineWidth, block.lineColor, block.backColor, (indexColumn * block.width), (indexRow * block.height)));  
+            listComponents.push(new component(indexComponent, block.width, block.height, block.lineWidth, block.lineColor, block.backColor, setColumnPosition(indexColumn), setRowPosition(indexRow), "", false));  
             indexComponent++;
         }
     }
@@ -187,13 +189,33 @@ function savePiece(pieces) {
     pieces.map(piece => {
         gridPositions[getRowPosition(piece.y)][getColumnPosition(piece.x)] = 1;
     });
-    
+
     // let's check if the first row contains some pieces
     if (gridPositions[0].some(col => col == 1)) {
         resetPieces();
     }
     else {
+        checkRow();
         generateNewPiece();
+    }
+}
+
+function checkRow() {
+    gridPositions.map((row, index) => {
+        if (row.filter(col => col == 1).length == gridColumns) {
+            removePieces(index);
+        }
+    });
+}
+
+function removePieces(row) {
+    let y = getY(row);
+    for (let idxCol = 0; idxCol < gridColumns; idxCol++) {
+        let index = listComponents.findIndex(cpt => cpt.removable == true && cpt.y == y && cpt.x == getX(idxCol));
+        if (index !== -1) {
+            listComponents.splice(index, 1);
+            gridPositions[row][idxCol] = 0;
+        }
     }
 }
 
@@ -211,6 +233,15 @@ function getColumnPosition(x) {
 
 function getRowPosition(y) {
     return y / block.height;
+}
+
+
+function getX(col) {
+    return col * block.width;
+}
+
+function getY(row) {
+    return row * block.height;
 }
 
 function getLeftMostPiece(pieces) {
@@ -259,12 +290,12 @@ function getLowestPiece(pieces) {
     return lowestPiece;
 }
 
-function setColumnPosition(pos) {
-    return pos * block.width;
+function setColumnPosition(col) {
+    return col * block.width;
 }
 
-function setRowPosition(pos) {
-    return pos * block.height;
+function setRowPosition(row) {
+    return row * block.height;
 }
 
 function logGrid() {

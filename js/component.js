@@ -1,7 +1,7 @@
 var listComponents = [];
 var indexComponent = 0;
 
-function component(index, width, height, lineWidth, lineColor, color, x, y, text = "") {
+function component(index, width, height, lineWidth, lineColor, color, x, y, text = "", removable = true) {
     this.index = index;
     this.width = width;
     this.height = height;
@@ -11,6 +11,7 @@ function component(index, width, height, lineWidth, lineColor, color, x, y, text
     this.speedX = 0;
     this.speedY = 0;
     this.text = text;
+    this.removable = removable;
 
     this.updCtx = function() {
         ctx = area.context;
