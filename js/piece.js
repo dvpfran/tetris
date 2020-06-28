@@ -97,16 +97,25 @@ function movePieceDown(pieces) {
 function rotatePiece(pieces) {
     const actualPositionTetrimino = actualTetrimino.actualPosition;
     const positionsActualTetrimino = actualTetrimino.positions[actualPositionTetrimino];
+    const oldPiecesPosition = pieces;
 
+    let rotate = true;
     for (let index = 0; index < pieces.length; index++) {
         const newColumnPosition = getColumnPosition(pieces[index].x) + positionsActualTetrimino[index][1];
         const newRowPosition = getRowPosition(pieces[index].y) + positionsActualTetrimino[index][0];
-
-        pieces[index].x = setColumnPosition(newColumnPosition);
-        pieces[index].y = setRowPosition(newRowPosition);
+        
+        if (gridPositions[newRowPosition][newColumnPosition] === 0) {
+            pieces[index].x = setColumnPosition(newColumnPosition);
+            pieces[index].y = setRowPosition(newRowPosition);
+        }
+        else {
+            index = pieces.length;
+            rotate = false;
+            pieces = oldPiecesPosition;
+        }
     }
 
-    actualTetrimino.actualPosition = (actualPositionTetrimino < (actualTetrimino.positions.length -1)) ? (actualTetrimino.actualPosition + 1) : 0;
+    actualTetrimino.actualPosition = (actualPositionTetrimino < (actualTetrimino.positions.length -1) && rotate) ? (actualTetrimino.actualPosition + 1) : 0;
 }
 
 function collid(pieces, direction) {
