@@ -1,17 +1,13 @@
-const widthArea = gridColumns * block.width;
-const heightArea = gridRows * block.height;
-let milliseconds = 20; // 20 milliseconds equals 50 times per second.
-
-let autorizeFunction = true;
-
 var area = {
     canvas : document.createElement("canvas"),
+    milliseconds : 20,
+    keyUp : true,
     start : function() {
-        this.canvas.width = widthArea;
-        this.canvas.height = heightArea;
+        this.canvas.width = gridColumns * block.width;
+        this.canvas.height = gridRows * block.height;
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
-        this.interval = setInterval(updateArea, milliseconds);
+        this.interval = setInterval(updateArea, this.milliseconds);
 
         window.addEventListener("keydown", function(e) {
             if (e.keyCode === 68 || e.keyCode === 39) {
@@ -24,19 +20,23 @@ var area = {
                 rotatePiece(actualTetrimino.pieces);
             }
             else if (e.keyCode === 83 || e.keyCode === 40) {
-                movePieceDown(actualTetrimino.pieces);
+                additionalTimeout = 250;
             }
             else if (e.keyCode === 32) {
-                if (autorizeFunction) {
-                    autorizeFunction = false;
-                    putPieceDown(actualTetrimino.pieces);
+                if (this.keyUp) {
+                    this.keyUp = false;
+                    actualTimeout = 0;
                 }
             }
         });
 
         window.addEventListener("keyup", function(e) {
+            if (e.keyCode === 83 || e.keyCode === 40) {
+                additionalTimeout = 0;
+            }
+
             if (e.keyCode === 32) {
-                autorizeFunction = true;
+                this.keyUp = true;
             }
         });
     },
@@ -47,7 +47,7 @@ var area = {
 
 function updateArea() {
     area.clear();
-
+        
     for(let indexComp = 0; indexComp < listComponents.length; indexComp++) {
         listComponents[indexComp].update();
     }

@@ -1,6 +1,6 @@
 const pixelBlock = 1;
 const gridColumns = 10;
-const gridRows = 10;
+const gridRows = 15;
 
 const pieceDirection = {
     RIGHT: 0,
@@ -9,6 +9,8 @@ const pieceDirection = {
     TOP: 3
 }
 
+var actualTimeout = 300;
+var additionalTimeout = 0;
 var indexComponent = 0;
 
 var gridPositions = [];
@@ -18,7 +20,6 @@ var actualTetrimino = {
     positions: [],
     actualPosition: 0,
 };
-var previousPieces = [];
 
 const block = {
     width: pixelBlock * 43,
@@ -84,14 +85,20 @@ function movePieceRight(pieces) {
 }
 
 function movePieceDown(pieces) {
-    if (!collid(pieces, pieceDirection.BOTTOM)) {
-        pieces.map(piece => {
-            piece.y += block.height;
-        });
-    }
-    else {
-        savePiece(pieces); 
-    }
+    setTimeout(() => {
+        if (!collid(pieces, pieceDirection.BOTTOM)) {
+            pieces.map(piece => {
+                piece.y += block.height;
+            });
+            movePieceDown(pieces);
+        }
+        else {
+            additionalTimeout = 0;
+            actualTimeout = 300;
+            savePiece(pieces);
+            movePieceDown(actualTetrimino.pieces);
+        }
+    }, actualTimeout - additionalTimeout);
 }
 
 function rotatePiece(pieces) {
@@ -114,7 +121,6 @@ function rotatePiece(pieces) {
             pieces = oldPiecesPosition;
         }
     }
-
     actualTetrimino.actualPosition = (actualPositionTetrimino < (actualTetrimino.positions.length -1) && rotate) ? (actualTetrimino.actualPosition + 1) : 0;
 }
 
@@ -173,46 +179,29 @@ function collid(pieces, direction) {
     if (!colid) {
         for (let idxRow = 0; idxRow < pieces.length; idxRow++) {
             if (gridPositions[getRowPosition(pieces[idxRow].y) + appendRow][getColumnPosition(pieces[idxRow].x) + appendColumn] == 1) {
-               idxRow = pieces.length;
-               colid = true; 
+                idxRow = pieces.length;
+                colid = true; 
             }
         }
     }
     return colid;
 }
 
-function putPieceDown(pieces) {
-    let leaveWhile = false;
-
-    do {
-        if (collid(pieces, pieceDirection.BOTTOM)) {
-            leaveWhile = true;
-        }
-        else {
-            movePieceDown(pieces, pieceDirection.BOTTOM);
-        }
-    } while(!leaveWhile);
-    
-    // temp
-    // console.clear();
-    for (let idxRow = 0; idxRow < gridPositions.length; idxRow++) {
-        let stringCol = idxRow + ": ";
-        for (let idxCol = 0; idxCol < gridPositions[idxRow].length; idxCol++) {
-            stringCol += "[" + gridPositions[idxRow][idxCol] + "] ";
-        }
-        //  (stringCol);
-    }
-}
-
 function savePiece(pieces) {
     pieces.map(piece => {
         gridPositions[getRowPosition(piece.y)][getColumnPosition(piece.x)] = 1;
     });
-    generateNewPiece();
+    
+    // let's check if the first row contains some pieces
+    if (gridPositions[0].some(col => col == 1)) {
+        resetPieces();
+    }
+    else {
+        generateNewPiece();
+    }
 }
 
 function resetPieces() {
-    previousPieces = [];
     listComponents = [];
     indexComponent = 0;
 
@@ -280,4 +269,15 @@ function setColumnPosition(pos) {
 
 function setRowPosition(pos) {
     return pos * block.height;
+}
+
+function logGrid() {
+    // console.clear();
+    for (let idxRow = 0; idxRow < gridPositions.length; idxRow++) {
+        let stringCol = idxRow + ": ";
+        for (let idxCol = 0; idxCol < gridPositions[idxRow].length; idxCol++) {
+            stringCol += "[" + gridPositions[idxRow][idxCol] + "] ";
+        }
+        //console.log(stringCol);
+    }
 }
