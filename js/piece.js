@@ -215,6 +215,25 @@ function removePieces(row) {
         if (index !== -1) {
             listComponents.splice(index, 1);
             gridPositions[row][idxCol] = 0;
+
+            // now we need to check if we have pieces above of this row and move them
+            let decreaseRows = 1;
+            let actualRow = 0;
+
+            let cpt = undefined;
+            do {
+                cpt = listComponents.filter(cpt => cpt.removable == true && cpt.y == getY(row - decreaseRows) && cpt.x == getX(idxCol))[0];
+                if (cpt !== undefined) {
+
+                    cpt.y = getY(row - actualRow);
+
+                    gridPositions[row - decreaseRows][idxCol] = 0;
+                    gridPositions[row - actualRow][idxCol] = 1;
+                    
+                    decreaseRows++;
+                    actualRow++;
+                }
+            } while (cpt !== undefined);
         }
     }
 }
@@ -305,6 +324,6 @@ function logGrid() {
         for (let idxCol = 0; idxCol < gridPositions[idxRow].length; idxCol++) {
             stringCol += "[" + gridPositions[idxRow][idxCol] + "] ";
         }
-        //console.log(stringCol);
+        console.log(stringCol);
     }
 }
