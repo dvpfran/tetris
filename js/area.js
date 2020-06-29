@@ -10,19 +10,19 @@ var area = {
         this.interval = setInterval(updateArea, this.milliseconds);
 
         window.addEventListener("keydown", function(e) {
-            if (e.keyCode === 68 || e.keyCode === 39) {
+            if (e.keyCode === keyCodeName.D || e.keyCode === keyCodeName.RIGHT_ARROW) {
                 movePieceRight(actualTetrimino.pieces);
             }
-            else if (e.keyCode === 65 || e.keyCode === 37) {
+            else if (e.keyCode === keyCodeName.A || e.keyCode === keyCodeName.LEFT_ARROW) {
                 movePieceLeft(actualTetrimino.pieces);
             }
-            else if (e.keyCode === 87 || e.keyCode === 38) {
+            else if (e.keyCode === keyCodeName.W || e.keyCode === keyCodeName.UP_ARROW) {
                 rotatePiece(actualTetrimino.pieces);
             }
-            else if (e.keyCode === 83 || e.keyCode === 40) {
+            else if (e.keyCode === keyCodeName.S || e.keyCode === keyCodeName.DOWN_ARROW) {
                 additionalTimeout = 250;
             }
-            else if (e.keyCode === 32) {
+            else if (e.keyCode === keyCodeName.SPACE) {
                 if (this.keyUp) {
                     this.keyUp = false;
                     actualTimeout = 0;
@@ -31,11 +31,11 @@ var area = {
         });
 
         window.addEventListener("keyup", function(e) {
-            if (e.keyCode === 83 || e.keyCode === 40) {
+            if (e.keyCode === keyCodeName.S || e.keyCode === keyCodeName.DOWN_ARROW) {
                 additionalTimeout = 0;
             }
 
-            if (e.keyCode === 32) {
+            if (e.keyCode === keyCodeName.SPACE) {
                 this.keyUp = true;
             }
         });

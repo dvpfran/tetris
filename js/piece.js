@@ -1,13 +1,6 @@
 const gridColumns = 10;
 const gridRows = 15;
 
-const pieceDirection = {
-    RIGHT: 0,
-    BOTTOM: 1,
-    LEFT: 2,
-    TOP: 3
-}
-
 const pixelBlock = 1;
 
 const block = {
@@ -59,7 +52,7 @@ function generateNewPiece(idxTetrimino = -1) {
     actualTetrimino.actualPosition = 0;
 
     for (let index = 0; index < tetrimino.diagram.length; index++) {
-        let piece = new component(indexComponent, block.width, block.height, block.lineWidth, block.lineColor, tetrimino.backColor, setColumnPosition(tetrimino.diagram[index][1]), setRowPosition(tetrimino.diagram[index][0]));
+        let piece = new component(indexComponent, block.width, block.height, block.lineWidth, block.lineColor, tetrimino.backColor, setColumnPosition(tetrimino.diagram[index][grid.COLUMN]), setRowPosition(tetrimino.diagram[index][grid.ROW]), index);
         actualTetrimino.pieces.push(piece);
         listComponents.push(piece);
         indexComponent++;
