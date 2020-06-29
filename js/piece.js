@@ -95,24 +95,31 @@ function movePieceDown(pieces) {
 function rotatePiece(pieces) {
     const actualPositionTetrimino = actualTetrimino.actualPosition;
     const positionsActualTetrimino = actualTetrimino.positions[actualPositionTetrimino];
-    const oldPiecesPosition = pieces;
 
-    let rotate = true;
+    let rotate = false;
+    let newPositions = [];
+
     for (let index = 0; index < pieces.length; index++) {
-        const newColumnPosition = getColumnPosition(pieces[index].x) + positionsActualTetrimino[index][1];
-        const newRowPosition = getRowPosition(pieces[index].y) + positionsActualTetrimino[index][0];
-        
-        if (gridPositions[newRowPosition][newColumnPosition] === 0) {
-            pieces[index].x = setColumnPosition(newColumnPosition);
-            pieces[index].y = setRowPosition(newRowPosition);
+        const newColumnPosition = getColumnPosition(pieces[index].x) + positionsActualTetrimino[index][grid.COLUMN];
+        const newRowPosition = getRowPosition(pieces[index].y) + positionsActualTetrimino[index][grid.ROW];
+
+        if (gridPositions[newRowPosition] !== undefined && gridPositions[newRowPosition][newColumnPosition] === 0) {
+                newPositions.push([setRowPosition(newRowPosition), setColumnPosition(newColumnPosition)]);
+                rotate = true;
         }
         else {
             index = pieces.length;
             rotate = false;
-            pieces = oldPiecesPosition;
         }
     }
-    actualTetrimino.actualPosition = (actualPositionTetrimino < (actualTetrimino.positions.length -1) && rotate) ? (actualTetrimino.actualPosition + 1) : 0;
+
+    if (rotate) {
+        for (let index = 0; index < pieces.length; index++) {
+            pieces[index].x = newPositions[index][grid.COLUMN];
+            pieces[index].y = newPositions[index][grid.ROW];
+        }
+        actualTetrimino.actualPosition = (actualPositionTetrimino < actualTetrimino.positions.length - 1) ? (actualTetrimino.actualPosition + 1) : 0;
+    }
 }
 
 function collid(pieces, direction) {
@@ -217,9 +224,8 @@ function removePieces(row) {
             do {
                 cpt = listComponents.filter(cpt => cpt.removable == true && cpt.y == getY(row - decreaseRows) && cpt.x == getX(idxCol))[0];
                 if (cpt !== undefined) {
-
                     cpt.y = getY(row - actualRow);
-
+                    
                     gridPositions[row - decreaseRows][idxCol] = 0;
                     gridPositions[row - actualRow][idxCol] = 1;
                     
