@@ -11,7 +11,7 @@ const block = {
     backColor: "rgb(100, 99, 99)",
 }
 
-var actualTimeout = 300;
+var actualTimeout = 500;
 var additionalTimeout = 0;
 var gridPositions = [];
 
@@ -20,6 +20,8 @@ var actualTetrimino = {
     positions: [],
     actualPosition: 0,
 };
+
+var canSavePiece = true;
 
 function generateGridPositions() {
     let columnPositon = [];
@@ -52,7 +54,7 @@ function generateNewPiece(idxTetrimino = -1) {
     actualTetrimino.actualPosition = 0;
 
     for (let index = 0; index < tetrimino.diagram.length; index++) {
-        let piece = new component(indexComponent, block.width, block.height, block.lineWidth, block.lineColor, tetrimino.backColor, setColumnPosition(tetrimino.diagram[index][grid.COLUMN]), setRowPosition(tetrimino.diagram[index][grid.ROW]), index);
+        let piece = new component(indexComponent, block.width, block.height, block.lineWidth, block.lineColor, tetrimino.backColor, setColumnPosition(tetrimino.diagram[index][grid.COLUMN]), setRowPosition(tetrimino.diagram[index][grid.ROW]));
         actualTetrimino.pieces.push(piece);
         listComponents.push(piece);
         indexComponent++;
@@ -76,17 +78,19 @@ function movePieceRight(pieces) {
 }
 
 function movePieceDown(pieces) {
-    setTimeout(() => {
-        if (!collid(pieces, pieceDirection.BOTTOM)) {
-            pieces.map(piece => {
-                piece.y += block.height;
-            });
-            movePieceDown(pieces);
-        }
+   	setTimeout(() => {
+		if (!collid(pieces, pieceDirection.BOTTOM)) {
+          	pieces.map(piece => {
+           		piece.y += block.height;
+      		});
+       		movePieceDown(pieces);
+       	}
         else {
             additionalTimeout = 0;
-            actualTimeout = 300;
-            savePiece(pieces);
+            actualTimeout = 500;
+			if (canSavePiece) {
+                savePiece(pieces);
+            }
             movePieceDown(actualTetrimino.pieces);
         }
     }, actualTimeout - additionalTimeout);
