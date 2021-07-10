@@ -7,8 +7,8 @@ const block = {
     width: 43 * pixelBlock,
     height: 43 * pixelBlock,
     lineWidth: 2,
-    lineColor: "white",
-    backColor: "rgb(100, 99, 99)",
+    lineColor: "#253034",
+    backColor: "#26393d",
 }
 
 var actualTimeout = 500;
